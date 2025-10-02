@@ -1522,7 +1522,7 @@ body {
 }
 .feature-content { padding: 40px; }
 .feature-list { grid-template-columns: 1fr; }
-.feature-banner { aspect-ratio: auto; }   /* ← Déjala así */
+.feature-banner { aspect-ratio: 1020 / 690; }
 .feature-2 .feature-banner { order: 1; }
 
 }
@@ -1755,4 +1755,47 @@ body {
 
 
 
+}
+
+/* ====== FIX: video con la MISMA altura que las fotos ====== */
+.feature-banner { aspect-ratio: 1020 / 690; } /* refuerzo final */
+
+/* Todo lo de adentro del banner ocupa el 100% del alto disponible */
+.feature-banner .feature-video,
+.feature-banner .video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Si tu contenedor del video tiene id usado en JS (#home-video-card), 
+   evita alturas fijas heredadas */
+#home-video-card { height: 100%; }
+/* ===== FEATURE: imágenes/video a toda la altura del renglón (desktop) ===== */
+@media (min-width: 992px){
+  /* Estira los ítems del grid a la misma altura */
+  .feature .container{
+    align-items: stretch;
+  }
+
+  /* El “marco” de la imagen/video toma el 100% del alto disponible */
+  .feature-banner{
+    aspect-ratio: auto;   /* anula la relación fija */
+    height: 100%;         /* ocupa todo el alto del renglón */
+    display: grid;        /* ayuda a que el contenido llene el frame */
+  }
+
+  /* Si es imagen dentro del banner, que llene el frame */
+  .feature-banner > .img-cover{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Si es el contenedor de video, también a 100% de alto */
+  .feature-banner .feature-video{
+    aspect-ratio: auto;   /* anula relación fija en desktop */
+    height: 100%;
+  }
 }
