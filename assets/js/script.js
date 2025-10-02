@@ -34,28 +34,66 @@ $toggleBtns.forEach($toggleBtn => {
 
 /* ==========================================================
    FILTRO DE PROPIEDADES + SECCIÓN "VENDER"
-   Requisitos en el HTML:
-   - Cada .card: data-operacion="comprar|rentar" data-tipo="casa|departamento|terreno|loft|bodega"
-   - Selects:
-       name="want-to"   => buy | sell | rent
-       name="property-type" => any | casa | departamento | terreno | loft | bodega
-   - (Opcional) input name="location" para filtrar por texto en la dirección
-   - Sección de formulario con id="owner-form" (oculta por defecto con hidden)
-   - Form con id="publishForm" y vista previa con id="owner-preview"
    ========================================================== */
 
 // === Selecciones ===
-const $sellFormSection  = document.getElementById('owner-form'); // sección del formulario
-const $propertySection  = document.querySelector('.section.property'); // sección de cards
+const $sellFormSection  = document.getElementById('owner-form');              // sección del formulario
+const $propertySection  = document.querySelector('.section.property');        // sección de cards
 const $wantSelect       = document.querySelector('select[name="want-to"]');
 const $typeSelect       = document.querySelector('select[name="property-type"]');
 const $locationInput    = document.querySelector('input[name="location"]');
 const $cards            = Array.from(document.querySelectorAll('.property-list .card'));
 
-// Normaliza texto
+// Normaliza texto (minúsculas, sin acentos, trim)
 function norm(str) {
   return (str || '').toString().toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+/* ---------- Dirección: utilidades ---------- */
+
+// Limitamos SIEMPRE a León, Gto
+const CITY_TAGS  = ['leon', 'leon de los aldama'];
+const STATE_TAGS = ['gto', 'guanajuato'];
+
+// Mínimo para considerar un término (evita que 'v' filtre todo)
+const MIN_QUERY_CHARS = 3;
+// Abreviaturas útiles que sí aceptamos cortas
+const SHORT_TOKENS = new Set(['av', 'blvd', 'lib', 'col']);
+
+// ¿Vale la pena usar el filtro por ubicación?
+function shouldUseLocation(q){
+  const toks = norm(q).split(/[,\s]+/).filter(Boolean);
+  return toks.some(t => t.length >= MIN_QUERY_CHARS || SHORT_TOKENS.has(t));
+}
+
+// Sinónimos/variantes de tokens comunes
+function expandToken(t){
+  const map = {
+    blvd: ['blvd', 'bulevar', 'boulevard', 'blvrd', 'blv'],
+    av:   ['av', 'avenida'],
+    lib:  ['lib', 'libramiento'],
+    col:  ['col', 'colonia'],
+    calle:['calle','c','cll']
+  };
+  return map[t] || [t];
+}
+
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+// Coincidencia por PALABRAS (inicio de palabra), respetando sinónimos
+function matchesLocation(addrNorm, queryNorm){
+  const tokens = queryNorm.split(/[,\s]+/).filter(Boolean);
+  for (const t of tokens){
+    if (t.length < MIN_QUERY_CHARS && !SHORT_TOKENS.has(t)) continue; // ignora ruido
+    let ok = false;
+    for (const variant of expandToken(t)){
+      const rx = new RegExp(`\\b${escapeRe(variant)}`); // empieza palabra
+      if (rx.test(addrNorm)){ ok = true; break; }
+    }
+    if (!ok) return false; // si un token no aparece, no hay match
+  }
+  return true;
 }
 
 // Mapear "Quiero" -> data-operacion de las cards
@@ -70,7 +108,7 @@ function filtrarPropiedades() {
   const tipo = $typeSelect ? $typeSelect.value : 'any';
   const queryUbicacion = $locationInput ? norm($locationInput.value) : '';
 
-  // Si elige VENDER: mostrar formulario y ocultar cards
+  // Si elige VENDER: mostrar form y ocultar cards
   if (want === 'sell') {
     if ($propertySection) $propertySection.hidden = true;
     if ($sellFormSection) $sellFormSection.hidden = false;
@@ -80,20 +118,28 @@ function filtrarPropiedades() {
     if ($sellFormSection) $sellFormSection.hidden = true;
   }
 
-  // Filtrado normal para comprar/rentar
   const esperado = operacionEsperada(want);
 
   $cards.forEach($card => {
     const cOp   = ($card.dataset.operacion || '').toLowerCase();
     const cTipo = ($card.dataset.tipo || '').toLowerCase();
+    const addr  = norm($card.querySelector('.card-text')?.textContent || '');
 
     let visible = cOp === esperado;
 
+    // 1) Limitar SIEMPRE a León, Gto (por seguridad geográfica)
+    if (visible) {
+      const inLeon = CITY_TAGS.some(t => addr.includes(t))
+                  && STATE_TAGS.some(t => addr.includes(t));
+      if (!inLeon) visible = false;
+    }
+
+    // 2) Tipo
     if (visible && tipo !== 'any') visible = cTipo === tipo;
 
-    if (visible && queryUbicacion) {
-      const addr = norm($card.querySelector('.card-text')?.textContent || '');
-      visible = addr.includes(queryUbicacion);
+    // 3) Búsqueda por ubicación (solo si la query es "suficiente")
+    if (visible && shouldUseLocation(queryUbicacion)) {
+      visible = matchesLocation(addr, queryUbicacion);
     }
 
     $card.style.display = visible ? '' : 'none';
@@ -105,15 +151,19 @@ $wantSelect?.addEventListener('change', filtrarPropiedades);
 $typeSelect?.addEventListener('change', filtrarPropiedades);
 $locationInput?.addEventListener('input', filtrarPropiedades);
 
+// Botón "Buscar" del formulario de filtros
+document.getElementById('search-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  filtrarPropiedades();
+  const target = document.getElementById('property') || document.querySelector('.property');
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
 // Ejecutar al cargar
 filtrarPropiedades();
 
-
 /* ==========================================================
    FORMULARIO DE PROPIETARIO (VENDER/RENTAR)
-   - imprime datos en #owner-preview (pruebas)
-   - listo para WhatsApp (comentado)
-   - Campos opcionales: zone, notes
    ========================================================== */
 
 const publishForm = document.getElementById('publishForm');
@@ -184,12 +234,8 @@ publishForm?.addEventListener('submit', (e) => {
   if (ownerTime) ownerTime.value = 'cualquier-hora';
 });
 
-
 /* ==========================================================
    NAVBAR → atajos (Home únicamente)
-   - Rentar / Comprar / Vender: ajustan el select "Quiero" y hacen scroll
-   - Nosotros: hace scroll a la sección de features
-   - Inicio: RESETEA FILTROS y vuelve al inicio de la página
 ========================================================== */
 (function setupNavbarShortcuts(){
   // ¿Estamos en Home? (para no tocar páginas de detalle)
@@ -209,7 +255,6 @@ publishForm?.addEventListener('submit', (e) => {
   const $navbar          = document.querySelector('[data-navbar]');
   const $header          = document.querySelector('[data-header]');
 
-  // Usa tu filtro real si existe
   function applyFilterIfExists(){
     if (typeof filtrarPropiedades === 'function') filtrarPropiedades();
   }
@@ -229,7 +274,7 @@ publishForm?.addEventListener('submit', (e) => {
     scrollToEl(target);
   }
 
-  // ✅ Reset total para Inicio
+  // Reset total para Inicio
   function resetToHomeDefault(clickedEl){
     if ($wantSelect)    $wantSelect.value = 'buy';   // Comprar
     if ($typeSelect)    $typeSelect.value = 'any';   // Cualquiera
@@ -245,7 +290,7 @@ publishForm?.addEventListener('submit', (e) => {
     clickedEl?.classList.add('active');
   }
 
-  document.querySelectorAll('.navbar .navbar-link').forEach(a => {
+document.querySelectorAll('.navbar .navbar-link, .footer .footer-link').forEach(a => {
     a.addEventListener('click', (ev) => {
       const key = (a.dataset.nav || a.textContent || '').toLowerCase();
 
@@ -263,17 +308,16 @@ publishForm?.addEventListener('submit', (e) => {
 
 /* ==========================================================
    NAVBAR → Botón "Contáctanos" (WhatsApp)
-   - Usa tus filtros actuales para armar el mensaje si existen
 ========================================================== */
 (function setupNavbarContact(){
   const CONTACT_NUMBER = '5214793139842'; // 52 + LADA + número, solo dígitos
-  const $btn = document.getElementById('nav-contact');
-  if (!$btn) return;
+  const $btns = Array.from(document.querySelectorAll('#nav-contact, #footer-contact'));
+  if (!$btns.length) return;
 
   // Referencias (si existen en esta página)
   const $want  = document.getElementById('want-to')       || document.querySelector('select[name="want-to"]');
-  const $type  = document.getElementById('property-type')  || document.querySelector('select[name="property-type"]');
-  const $loc   = document.getElementById('location')       || document.querySelector('input[name="location"]');
+  const $type  = document.getElementById('property-type') || document.querySelector('select[name="property-type"]');
+  const $loc   = document.getElementById('location')      || document.querySelector('input[name="location"]');
   const $nav   = document.querySelector('[data-navbar]');
 
   const wantMap = { buy: 'comprar', rent: 'rentar', sell: 'vender' };
@@ -283,29 +327,23 @@ publishForm?.addEventListener('submit', (e) => {
     window.open(url, '_blank');
   }
 
-  $btn.addEventListener('click', (e) => {
+  function handleClick(e){
     e.preventDefault();
-
-    // Construye un mensaje simpático con contexto si hay filtros
     const want = $want?.value || 'buy';
     const wantTxt = wantMap[want] || 'comprar';
     const typeTxt = ($type?.value && $type.value !== 'any') ? $type.options[$type.selectedIndex].text : 'cualquier tipo';
     const locTxt  = $loc?.value?.trim() ? ` en "${$loc.value.trim()}"` : '';
-
-    const msg =
-`Hola 👋, me gustaría ${wantTxt} una propiedad (${typeTxt})${locTxt}.
-¿Me pueden apoyar?`;
-
+    const msg = `Hola 👋, me gustaría ${wantTxt} una propiedad (${typeTxt})${locTxt}.\n¿Me pueden apoyar?`;
     openWhatsApp(msg);
-
-    // Cierra menú móvil si estaba abierto
     if ($nav?.classList.contains('active')) $nav.classList.remove('active');
-  });
+  }
+
+  $btns.forEach(btn => btn.addEventListener('click', handleClick));
 })();
 
 
 /* ==========================================================
-   VIDEO HERO (reproducción inline con overlay) - sin abrir pestañas
+   VIDEO HERO (reproducción inline con overlay)
 ========================================================== */
 (function setupHeroVideo(){
   const card  = document.getElementById('home-video-card');
@@ -329,13 +367,11 @@ publishForm?.addEventListener('submit', (e) => {
     try {
       card.classList.add('playing');
       video.controls = true;
-      // Fuerza a cargar por si quedó en caché mal
-      video.load();
+      video.load();        // fuerza recarga
       await video.play();
       console.log('[video] playing');
     } catch (err) {
       console.warn('[video] play() rechazado:', err);
-      // fallback: muestra controles y no ocultes el botón
       card.classList.remove('playing');
       video.controls = true;
       alert('El navegador bloqueó la reproducción automática. Intenta dar play en los controles.');
@@ -357,8 +393,3 @@ publishForm?.addEventListener('submit', (e) => {
     card.classList.remove('playing');
   });
 })();
-
-
-
-
-

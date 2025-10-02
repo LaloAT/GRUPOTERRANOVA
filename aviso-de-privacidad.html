@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detalle de propiedad | Grupo Terranova</title>
+
+  <!-- Estilos globales -->
+  <link rel="stylesheet" href="./assets/css/style.css"/>
+
+  <!-- Iconos (igual que en el home) -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@400;500;700&display=swap" rel="stylesheet"/>
+
+  <!-- Fondo tipo HERO solo para esta página (no toca tu CSS global) -->
+  <style>
+    /* Wrapper que pinta el fondo degradado y NO altera el layout interno */
+    .detail-hero{
+      position: relative;
+      background-image: var(--gradient);      /* mismo degradado que el hero */
+      padding-block: 110px 60px;              /* despeje por el header fijo */
+      overflow: hidden;
+      isolation: isolate;                     /* patrón por detrás */
+    }
+    /* Imagen de patrón, colocada detrás del contenido */
+    .detail-hero__pattern{
+      position: absolute;
+      top: 0;
+      left: 25%;
+      right: 0;
+      min-height: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;                            /* va detrás de la sección */
+      object-fit: cover;
+      opacity: 0.28;                          /* igual que en el home */
+    }
+
+    /* (opcional) suaviza el contraste del panel sobre el fondo */
+    .property-detail .panel{
+      background: var(--neutral-100);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== HEADER (igual que en el home) ====== -->
+  <header class="header" data-header>
+    <div class="container">
+      <a href="./index.html" class="logo" aria-label="Ir al inicio">
+        <img src="./assets/images/logo.png" width="140" height="22" alt="Grupo Terranova" />
+      </a>
+
+      <nav class="navbar" data-navbar>
+        <ul class="navbar-list">
+          <li><a href="./index.html" class="navbar-link label-medium">Inicio</a></li>
+          <li><a href="./index.html#hero" class="navbar-link label-medium">Rentar</a></li>
+          <li><a href="./index.html#hero" class="navbar-link label-medium">Vender</a></li>
+          <li><a href="./index.html#property" class="navbar-link label-medium">Comprar</a></li>
+          <li><a href="#" class="navbar-link label-medium">Nosotros</a></li>
+        </ul>
+
+        <div class="navbar-wrapper">
+          <!-- <a href="#" class="btn-link label-medium">Iniciar sesión</a> -->
+          <a href="#" id="nav-contact" class="btn btn-fill label-medium">Contáctanos</a>
+        </div>
+      </nav>
+
+      <button class="nav-toggle-btn icon-btn" aria-label="Alternar navegación" data-nav-toggler>
+        <span class="material-symbols-rounded open" aria-hidden="true">menu</span>
+        <span class="material-symbols-rounded close" aria-hidden="true">close</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ====== SECCIÓN con fondo tipo hero ====== -->
+  <section class="detail-hero">
+    <!-- patrón del fondo (mismo que en el home) -->
+    <img
+      src="./assets/images/bg-pattern.png"
+      width="1240"
+      height="840"
+      alt=""
+      aria-hidden="true"
+      class="detail-hero__pattern"
+    />
+
+    <!-- ====== CONTENIDO DEL DETALLE ====== -->
+    <main>
+      <section class="section property-detail">
+        <div class="container">
+
+          <!-- Volver -->
+          <div class="page-top">
+            <a class="back-link label-medium" href="./index.html#property">
+              <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+              Volver al listado
+            </a>
+          </div>
+
+          <div class="grid">
+            <!-- ========= LADO IZQUIERDO: TARJETA ========= -->
+            <article class="panel">
+              <img id="prop-hero" class="hero-img" src="./assets/images/property-1.jpg" alt="Imagen de la propiedad"/>
+
+              <div class="panel-body">
+                <div class="title-wrap">
+                  <h1 id="prop-title" class="headline-small">Título de la propiedad</h1>
+                  <address id="prop-address" class="body-medium" style="color:var(--neutral-40);">
+                    Dirección, Ciudad, CP
+                  </address>
+                  <span id="prop-availability" class="availability label-medium">Disponible</span>
+                </div>
+
+                <div class="price-badges">
+                  <span id="prop-price" class="title-large">$0 MXN</span>
+                  <span id="prop-op" class="pill">Venta</span>
+                  <span id="prop-type" class="pill">Casa</span>
+                </div>
+
+                <div class="meta-row">
+                  <div class="meta-item">
+                    <span class="material-symbols-rounded meta-icon" aria-hidden="true">bed</span>
+                    <span id="prop-beds" class="label-medium">0 rec</span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="material-symbols-rounded meta-icon" aria-hidden="true">bathtub</span>
+                    <span id="prop-baths" class="label-medium">0 baños</span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="material-symbols-rounded meta-icon" aria-hidden="true">straighten</span>
+                    <span id="prop-size" class="label-medium">0 m²</span>
+                  </div>
+                </div>
+
+<!-- Galería / Carrusel -->
+<h3 class="section-title-mini title-small">Galería</h3>
+
+<div class="carousel" id="prop-carousel">
+  <div class="carousel-track" id="prop-carousel-track" aria-label="Galería de imágenes">
+    <!-- Las miniaturas se insertan vía JS -->
+  </div>
+</div>
+
+
+
+                <!-- Amenities -->
+                <h3 class="section-title-mini title-small">Amenidades</h3>
+                <div id="prop-features" class="features"></div>
+
+                <!-- Descripción -->
+                <h3 class="section-title-mini title-small">Descripción</h3>
+                <p id="prop-description" class="desc body-medium"></p>
+
+                <!-- CTA -->
+                <div class="cta-wrap">
+                  <a id="prop-cta" class="btn btn-fill label-medium" href="#contacto">Visita esta propiedad</a>
+                  <a id="prop-whats" class="whats label-medium" href="#" target="_blank" rel="noopener">
+                    <img src="./assets/images/whatsapp.svg" alt="" width="18" height="18" />
+                    479 313 9842
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- ========= LADO DERECHO: MAPA ========= -->
+            <aside class="panel map-panel">
+              <div id="prop-map" class="map"></div>
+            </aside>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </section>
+
+<!-- Lightbox para ver la imagen en grande -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+
+  <figure class="lightbox-content" role="dialog" aria-modal="true" aria-label="Galería de imágenes">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+
+    <button class="lightbox-nav prev" id="lightbox-prev" aria-label="Anterior">
+      <span class="material-symbols-rounded">chevron_left</span>
+    </button>
+
+    <img id="lightbox-image" alt="Foto de la propiedad" />
+
+    <button class="lightbox-nav next" id="lightbox-next" aria-label="Siguiente">
+      <span class="material-symbols-rounded">chevron_right</span>
+    </button>
+  </figure>
+</div>
+<!-- VISITAR ESTA PROPIEDAD -->
+<section class="section owner-form visit-form" id="visit-form" hidden>
+  <div class="container">
+    <div class="title-wrapper">
+      <div>
+        <h2 class="section-title headline-small">
+          Agenda una visita
+        </h2>
+        <p class="section-text body-large">
+          Déjanos tus datos y te confirmamos la visita a
+          <strong id="visit-prop-title">esta propiedad</strong>.
+        </p>
+      </div>
+
+      <!-- (opcional) Bloque lateral tipo “ayuda” -->
+      <div class="visit-aside body-medium" aria-hidden="true">
+        <span class="material-symbols-rounded" style="font-size:22px">event_available</span>
+        Atención personalizada · Confirmación por WhatsApp
+      </div>
+    </div>
+
+    <form id="visitForm" class="form-card">
+      <!-- Nombre -->
+      <div class="form-row">
+        <label class="label-medium" for="visit-name">Nombre y apellidos</label>
+        <input id="visit-name" name="name" type="text" class="input" placeholder="Tu nombre"
+               autocomplete="name" required />
+      </div>
+
+      <!-- Teléfono + Horario (2 columnas en desktop) -->
+      <div class="form-two">
+        <div class="form-row">
+          <label class="label-medium" for="visit-phone">Teléfono</label>
+          <div class="phone-wrapper">
+            <span class="phone-flag" aria-hidden="true">🇲🇽 +52</span>
+            <input id="visit-phone" name="phone" type="tel" class="input"
+                   placeholder="477 123 5678" inputmode="tel" autocomplete="tel" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="label-medium" for="visit-time">Horario de contacto</label>
+          <select id="visit-time" name="contact-time" class="input" required>
+            <option value="" disabled selected>Selecciona un horario</option>
+            <option value="cualquier-hora">Cualquier hora</option>
+            <option value="mañana">Mañana (9:00–12:00)</option>
+            <option value="tarde">Tarde (12:00–17:00)</option>
+            <option value="noche">Noche (17:00–20:00)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Comentarios -->
+      <div class="form-row">
+        <label class="label-medium" for="visit-notes">Comentarios (opcional)</label>
+        <textarea id="visit-notes" name="notes" rows="3" class="input"
+                  placeholder="¿Cuándo te gustaría visitarla?, dudas, etc."></textarea>
+      </div>
+
+      <!-- Consentimiento -->
+      <div class="form-row">
+        <label class="checkbox" for="visit-consent">
+          <input type="checkbox" id="visit-consent" required />
+          <span class="body-medium">Acepto que me contacten por teléfono o WhatsApp.</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn label-medium" id="visit-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-fill label-medium">Enviar</button>
+      </div>
+    </form>
+
+    <!-- Vista previa (debug opcional) -->
+    <div id="visit-preview" class="preview" hidden></div>
+  </div>
+</section>
+
+
+   <!-- 
+    - #PIE DE PÁGINA
+  -->
+
+    <footer class="footer">
+      <div class="footer-top">
+        <div class="container">
+          <div class="footer-brand">
+            <a href="#" class="logo">
+              <img
+                src="./assets/images/logo.png"
+                width="190"
+                height="28"
+                alt="Grupo Terranova"
+              />
+            </a>
+
+            <p class="body-medium footer-text">
+  En Grupo Terranova conectamos oportunidades: ayudamos a propietarios a vender o rentar
+  con seguridad, y acompañamos a compradores a elegir y encontrar como financiar su próxima propiedad.
+  Experiencia local en León, Guanajuato y atención cercana.
+            </p>
+          </div>
+
+          <nav class="footer-nav" aria-labelledby="nav-label-1">
+            <p class="title-small footer-list-title" id="nav-label-1">
+              Enlaces rápidos
+            </p>
+
+            <ul class="footer-list">
+              <li>
+                <a href="#" class="body-medium footer-link">Inicio</a>
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link">Comprar</a>
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link">Vender</a>
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link">Rentar</a>
+              </li>
+            </ul>
+          </nav>
+
+          <nav class="footer-nav" aria-labelledby="nav-label-2">
+            <p class="title-small footer-list-title" id="nav-label-2">
+              Soporte
+            </p>
+
+            <ul class="footer-list">
+              <li>
+                <a href="#" class="body-medium footer-link">Nosotros</a>
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link">Contáctanos</a>
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link"
+                  >Aviso de privacidad</a
+                >
+              </li>
+
+              <li>
+                <a href="#" class="body-medium footer-link"
+                  >Términos y condiciones</a
+                >
+              </li>
+            </ul>
+          </nav>
+
+          <nav class="footer-nav" aria-labelledby="nav-label-3">
+            <p class="title-small footer-list-title" id="nav-label-3">
+              Contacto
+            </p>
+
+            <ul class="footer-list">
+              <li>
+                <a href="#" class="body-medium footer-link"
+                  >grupoterranovaleon@gmail.com</a
+                >
+              </li>
+
+              <li>
+                <address class="address body-medium">
+                  León de los Aldama, Guanajuato México
+                </address>
+              </li>
+
+              <li>
+                <ul class="social-list">
+                  <li>
+                    <a href="#" class="social-link">
+                      <img src="./assets/images/facebook.svg" alt="facebook" />
+                    </a>
+                  </li>
+
+                  <li>
+                    <a href="#" class="social-link">
+                      <img src="./assets/images/whatsapp.svg" alt="whatsapp" />
+                    </a>
+                  </li>
+
+                  <li>
+                    <a href="#" class="social-link">
+                      <img src="./assets/images/insta.svg" alt="instagram" />
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container">
+          <p class="copyright body-medium">© 2025 Grupo Terreanova</p>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Scripts globales + script de detalle -->
+  <script src="./assets/js/script.js"></script>
+  <script src="./assets/js/property.js"></script>
+
+
+
+
+</body>
+</html>
