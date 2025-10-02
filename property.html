@@ -50,14 +50,14 @@
         <img src="./assets/images/logo.png" width="140" height="22" alt="Grupo Terranova" />
       </a>
 
-      <nav class="navbar" data-navbar>
-        <ul class="navbar-list">
-          <li><a href="./index.html" class="navbar-link label-medium">Inicio</a></li>
-          <li><a href="./index.html#hero" class="navbar-link label-medium">Rentar</a></li>
-          <li><a href="./index.html#hero" class="navbar-link label-medium">Vender</a></li>
-          <li><a href="./index.html#property" class="navbar-link label-medium">Comprar</a></li>
-          <li><a href="#" class="navbar-link label-medium">Nosotros</a></li>
-        </ul>
+<ul class="navbar-list">
+  <li><a href="./index.html"           class="navbar-link label-medium">Inicio</a></li>
+  <li><a href="./index.html#go=rent"   class="navbar-link label-medium">Rentar</a></li>
+  <li><a href="./index.html#go=sell"   class="navbar-link label-medium">Vender</a></li>
+  <li><a href="./index.html#go=buy"    class="navbar-link label-medium">Comprar</a></li>
+  <li><a href="./index.html#nosotros"  class="navbar-link label-medium">Nosotros</a></li>
+</ul>
+
 
         <div class="navbar-wrapper">
           <!-- <a href="#" class="btn-link label-medium">Iniciar sesión</a> -->
@@ -276,128 +276,92 @@
     - #PIE DE PÁGINA
   -->
 
-    <footer class="footer">
-      <div class="footer-top">
-        <div class="container">
-          <div class="footer-brand">
-            <a href="#" class="logo">
-              <img
-                src="./assets/images/logo.png"
-                width="190"
-                height="28"
-                alt="Grupo Terranova"
-              />
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container">
+
+      <div class="footer-brand">
+        <a href="./index.html" class="logo" aria-label="Ir al inicio">
+          <img src="./assets/images/logo.png" width="190" height="28" alt="Grupo Terranova"/>
+        </a>
+
+        <p class="body-medium footer-text">
+          En Grupo Terranova conectamos oportunidades: ayudamos a propietarios a vender o rentar
+          con seguridad, y acompañamos a compradores a elegir y encontrar como financiar su próxima propiedad.
+          Experiencia local en León, Guanajuato y atención cercana.
+        </p>
+      </div>
+
+      <nav class="footer-nav" aria-labelledby="nav-label-1">
+        <p class="title-small footer-list-title" id="nav-label-1">Enlaces rápidos</p>
+        <ul class="footer-list">
+          <li><a href="./index.html"          class="body-medium footer-link">Inicio</a></li>
+          <li><a href="./index.html#go=buy"   class="body-medium footer-link">Comprar</a></li>
+          <li><a href="./index.html#go=sell"  class="body-medium footer-link">Vender</a></li>
+          <li><a href="./index.html#go=rent"  class="body-medium footer-link">Rentar</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-nav" aria-labelledby="nav-label-2">
+        <p class="title-small footer-list-title" id="nav-label-2">Soporte</p>
+        <ul class="footer-list">
+          <li><a href="./index.html#nosotros"         class="body-medium footer-link">Nosotros</a></li>
+          <!-- Este abre WhatsApp por JS (id requerido): -->
+          <li><a href="#" id="footer-contact"         class="body-medium footer-link">Contáctanos</a></li>
+          <!-- Pon tus páginas cuando las tengas listas -->
+    <li><a href="./aviso-de-privacidad.html" class="body-medium footer-link">Aviso de privacidad</a></li>
+    <li><a href="./terminos-y-condiciones.html" class="body-medium footer-link">Términos y condiciones</a></li>
+  </ul>
+      </nav>
+
+      <nav class="footer-nav" aria-labelledby="nav-label-3">
+        <p class="title-small footer-list-title" id="nav-label-3">Contacto</p>
+        <ul class="footer-list">
+          <li>
+            <a href="mailto:grupoterranovaleon@gmail.com" class="body-medium footer-link">
+              grupoterranovaleon@gmail.com
             </a>
-
-            <p class="body-medium footer-text">
-  En Grupo Terranova conectamos oportunidades: ayudamos a propietarios a vender o rentar
-  con seguridad, y acompañamos a compradores a elegir y encontrar como financiar su próxima propiedad.
-  Experiencia local en León, Guanajuato y atención cercana.
-            </p>
-          </div>
-
-          <nav class="footer-nav" aria-labelledby="nav-label-1">
-            <p class="title-small footer-list-title" id="nav-label-1">
-              Enlaces rápidos
-            </p>
-
-            <ul class="footer-list">
+          </li>
+          <li>
+            <address class="address body-medium">
+              León de los Aldama, Guanajuato, México
+            </address>
+          </li>
+          <li>
+            <ul class="social-list">
               <li>
-                <a href="#" class="body-medium footer-link">Inicio</a>
+                <a href="https://www.facebook.com/GrupoTerranovaLeon/"
+                   class="social-link" target="_blank" rel="noopener">
+                  <img src="./assets/images/facebook.svg" alt="Facebook"/>
+                </a>
               </li>
-
               <li>
-                <a href="#" class="body-medium footer-link">Comprar</a>
+                <a href="https://wa.me/5214793139842"
+                   class="social-link" target="_blank" rel="noopener">
+                  <img src="./assets/images/whatsapp.svg" alt="WhatsApp"/>
+                </a>
               </li>
-
               <li>
-                <a href="#" class="body-medium footer-link">Vender</a>
-              </li>
-
-              <li>
-                <a href="#" class="body-medium footer-link">Rentar</a>
+                <a href="https://www.instagram.com/grupoterranovaleon/"
+                   class="social-link" target="_blank" rel="noopener">
+                  <img src="./assets/images/insta.svg" alt="Instagram"/>
+                </a>
               </li>
             </ul>
-          </nav>
+          </li>
+        </ul>
+      </nav>
 
-          <nav class="footer-nav" aria-labelledby="nav-label-2">
-            <p class="title-small footer-list-title" id="nav-label-2">
-              Soporte
-            </p>
+    </div>
+  </div>
 
-            <ul class="footer-list">
-              <li>
-                <a href="#" class="body-medium footer-link">Nosotros</a>
-              </li>
+  <div class="footer-bottom">
+    <div class="container">
+      <p class="copyright body-medium">© 2025 Grupo Terranova</p>
+    </div>
+  </div>
+</footer>
 
-              <li>
-                <a href="#" class="body-medium footer-link">Contáctanos</a>
-              </li>
-
-              <li>
-                <a href="#" class="body-medium footer-link"
-                  >Aviso de privacidad</a
-                >
-              </li>
-
-              <li>
-                <a href="#" class="body-medium footer-link"
-                  >Términos y condiciones</a
-                >
-              </li>
-            </ul>
-          </nav>
-
-          <nav class="footer-nav" aria-labelledby="nav-label-3">
-            <p class="title-small footer-list-title" id="nav-label-3">
-              Contacto
-            </p>
-
-            <ul class="footer-list">
-              <li>
-                <a href="#" class="body-medium footer-link"
-                  >grupoterranovaleon@gmail.com</a
-                >
-              </li>
-
-              <li>
-                <address class="address body-medium">
-                  León de los Aldama, Guanajuato México
-                </address>
-              </li>
-
-              <li>
-                <ul class="social-list">
-                  <li>
-                    <a href="#" class="social-link">
-                      <img src="./assets/images/facebook.svg" alt="facebook" />
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="#" class="social-link">
-                      <img src="./assets/images/whatsapp.svg" alt="whatsapp" />
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="#" class="social-link">
-                      <img src="./assets/images/insta.svg" alt="instagram" />
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <div class="container">
-          <p class="copyright body-medium">© 2025 Grupo Terreanova</p>
-        </div>
-      </div>
-    </footer>
 
   <!-- Scripts globales + script de detalle -->
   <script src="./assets/js/script.js"></script>

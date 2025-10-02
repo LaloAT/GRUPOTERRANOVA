@@ -211,31 +211,17 @@ publishForm?.addEventListener('submit', (e) => {
     previewBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // >>> Futuro: enviar a WhatsApp
-  // const msg = encodeURIComponent(
-  //   `Hola, quiero ${op} mi propiedad.\n` +
-  //   `Tipo: ${type}\n` +
-  //   `Nombre: ${name}\n` +
-  //   `Tel: +52 ${phone}\n` +
-  //   `Horario: ${time}\n` +
-  //   `Zona: ${zone || '—'}\n` +
-  //   `Comentarios: ${notes || '—'}`
-  // );
-  // const tuNumero = '524771234567'; // 52 + LADA + número (sin '+')
-  // window.open(`https://wa.me/${tuNumero}?text=${msg}`, '_blank');
-
   // Reset suave
   publishForm.reset();
-  // Defaults
   if (publishForm['owner-operation']) publishForm['owner-operation'][0].checked = true;
   const ownerType = document.getElementById('owner-type');
-  if (ownerType) ownerType.value = 'cualquiera';
+  if (ownerType) ownerType.selectedIndex = 0; // vuelve al placeholder
   const ownerTime = document.getElementById('owner-time');
   if (ownerTime) ownerTime.value = 'cualquier-hora';
 });
 
 /* ==========================================================
-   NAVBAR → atajos (Home únicamente)
+   NAVBAR → atajos (Home únicamente) + Deep links
 ========================================================== */
 (function setupNavbarShortcuts(){
   // ¿Estamos en Home? (para no tocar páginas de detalle)
@@ -285,29 +271,59 @@ publishForm?.addEventListener('submit', (e) => {
     applyFilterIfExists();
     scrollToEl($hero || document.body);
 
-    // activar visualmente
     document.querySelectorAll('.navbar-link[data-nav], .navbar .navbar-link').forEach(a => a.classList.remove('active'));
     clickedEl?.classList.add('active');
   }
 
-document.querySelectorAll('.navbar .navbar-link, .footer .footer-link').forEach(a => {
+  // Clicks de navbar + footer (solo en Home, para no recargar)
+  document.querySelectorAll('.navbar .navbar-link, .footer .footer-link').forEach(a => {
     a.addEventListener('click', (ev) => {
+      // ⛔️ Guard clause: si el enlace apunta a una URL real (no # ni #ancla), dejamos navegar normal
+      const href = a.getAttribute('href') || '';
+      if (href && href !== '#' && !href.startsWith('#')) return;
+
       const key = (a.dataset.nav || a.textContent || '').toLowerCase();
 
       if (key.includes('rentar'))       { ev.preventDefault(); setWantAndGo('rent'); }
       else if (key.includes('comprar')) { ev.preventDefault(); setWantAndGo('buy');  }
       else if (key.includes('vender'))  { ev.preventDefault(); setWantAndGo('sell'); }
-      else if (key.includes('nosotros')){ ev.preventDefault(); scrollToEl($featureTop || document.body); }
+      else if (key.includes('nosotros') || href === '#nosotros'){ ev.preventDefault(); scrollToEl($featureTop || document.body); }
       else if (key.includes('inicio'))  { ev.preventDefault(); resetToHomeDefault(a); }
 
-      // cerrar menú en mobile si estaba abierto
       if ($navbar?.classList.contains('active')) $navbar.classList.remove('active');
     });
   });
+
+  // --- Deep links desde otras páginas o footer ---
+  function handleDeepLink() {
+    const rawHash = (window.location.hash || '').replace(/^#/, '').trim();
+    const qsGo = new URLSearchParams(window.location.search).get('go');
+
+    let action = null;
+    if (rawHash.startsWith('go=')) action = rawHash.split('=')[1];
+    else if (qsGo) action = qsGo;
+
+    if (action && ['buy','rent','sell'].includes(action)) {
+      if ($wantSelect) { $wantSelect.value = action; applyFilterIfExists(); }
+      const target = (action === 'sell') ? ($sellFormSection || $hero || document.body)
+                                         : ($searchForm || $hero || $propertySection || document.body);
+      scrollToEl(target);
+      return;
+    }
+
+    if (rawHash === 'nosotros') {
+      scrollToEl($featureTop || document.body);
+    } else if (rawHash === 'property') {
+      scrollToEl($propertySection || document.body);
+    }
+  }
+
+  handleDeepLink();
+  window.addEventListener('hashchange', handleDeepLink);
 })();
 
 /* ==========================================================
-   NAVBAR → Botón "Contáctanos" (WhatsApp)
+   NAVBAR/FOOTER → Botón "Contáctanos" (WhatsApp)
 ========================================================== */
 (function setupNavbarContact(){
   const CONTACT_NUMBER = '5214793139842'; // 52 + LADA + número, solo dígitos
@@ -340,7 +356,6 @@ document.querySelectorAll('.navbar .navbar-link, .footer .footer-link').forEach(
 
   $btns.forEach(btn => btn.addEventListener('click', handleClick));
 })();
-
 
 /* ==========================================================
    VIDEO HERO (reproducción inline con overlay)
