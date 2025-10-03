@@ -427,3 +427,12 @@ async function sendEmailWebhook(payload){
     console.warn("Webhook email falló:", err);
   }
 }
+const track = document.getElementById('prop-carousel-track');
+images.forEach(src => {
+  const a = document.createElement('a');
+  a.className = 'thumb';
+  a.href = '#';
+  a.addEventListener('click', e => { e.preventDefault(); openLightbox(src); });
+  a.innerHTML = `<img src="${src}" alt="Foto de la propiedad" loading="lazy">`;
+  track.appendChild(a);
+});

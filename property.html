@@ -39,38 +39,58 @@
     .property-detail .panel{
       background: var(--neutral-100);
     }
+    /* ===== Galería detalle ===== */
+.carousel { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+#prop-carousel-track { display: flex; gap: 12px; }
+
+#prop-carousel-track .thumb { flex: 0 0 78vw; max-width: 520px; }    /* ancho de cada slide en móvil */
+@media (min-width: 768px){ #prop-carousel-track .thumb { flex: 0 0 280px; } }
+
+#prop-carousel-track img{
+  display:block; width:100%;
+  aspect-ratio: 16/10;          /* alto uniforme */
+  object-fit: cover;             /* recorta sin deformar */
+  border-radius: 16px;
+  background:#eef2f7;            /* skeleton */
+}
+
+/* mapa un poco más alto en móvil */
+.map-panel .map { height: 260px; }
+@media (min-width: 768px){ .map-panel .map { height: 420px; } }
+
   </style>
 </head>
 <body>
 
   <!-- ====== HEADER (igual que en el home) ====== -->
-  <header class="header" data-header>
-    <div class="container">
-      <a href="./index.html" class="logo" aria-label="Ir al inicio">
-        <img src="./assets/images/logo.png" width="140" height="22" alt="Grupo Terranova" />
-      </a>
+<header class="header" data-header>
+  <div class="container">
+    <a href="./index.html" class="logo" aria-label="Ir al inicio">
+      <img src="./assets/images/logo.png" width="140" height="22" alt="Grupo Terranova" />
+    </a>
 
-<ul class="navbar-list">
-  <li><a href="./index.html"           class="navbar-link label-medium">Inicio</a></li>
-  <li><a href="./index.html#go=rent"   class="navbar-link label-medium">Rentar</a></li>
-  <li><a href="./index.html#go=sell"   class="navbar-link label-medium">Vender</a></li>
-  <li><a href="./index.html#go=buy"    class="navbar-link label-medium">Comprar</a></li>
-  <li><a href="./index.html#nosotros"  class="navbar-link label-medium">Nosotros</a></li>
-</ul>
+    <!-- ✅ el nav completo, igual al home -->
+    <nav class="navbar" data-navbar>
+      <ul class="navbar-list">
+        <li><a href="./index.html"          class="navbar-link label-medium">Inicio</a></li>
+        <li><a href="./index.html#go=rent"  class="navbar-link label-medium">Rentar</a></li>
+        <li><a href="./index.html#go=sell"  class="navbar-link label-medium">Vender</a></li>
+        <li><a href="./index.html#go=buy"   class="navbar-link label-medium">Comprar</a></li>
+        <li><a href="./index.html#nosotros" class="navbar-link label-medium">Nosotros</a></li>
+      </ul>
 
+      <div class="navbar-wrapper">
+        <a href="#" id="nav-contact" class="btn btn-fill label-medium">Contáctanos</a>
+      </div>
+    </nav>
 
-        <div class="navbar-wrapper">
-          <!-- <a href="#" class="btn-link label-medium">Iniciar sesión</a> -->
-          <a href="#" id="nav-contact" class="btn btn-fill label-medium">Contáctanos</a>
-        </div>
-      </nav>
+    <button class="nav-toggle-btn icon-btn" aria-label="Alternar navegación" data-nav-toggler>
+      <span class="material-symbols-rounded open" aria-hidden="true">menu</span>
+      <span class="material-symbols-rounded close" aria-hidden="true">close</span>
+    </button>
+  </div>
+</header>
 
-      <button class="nav-toggle-btn icon-btn" aria-label="Alternar navegación" data-nav-toggler>
-        <span class="material-symbols-rounded open" aria-hidden="true">menu</span>
-        <span class="material-symbols-rounded close" aria-hidden="true">close</span>
-      </button>
-    </div>
-  </header>
 
   <!-- ====== SECCIÓN con fondo tipo hero ====== -->
   <section class="detail-hero">
