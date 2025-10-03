@@ -328,3 +328,46 @@ function equalizeMapHeight() {
 
 
 
+const visitForm = document.getElementById('visitForm');
+const visitPreview = document.getElementById('visit-preview');
+
+function normalizePhoneMxPlain(v){
+  return (v || '').replace(/\D+/g, '').replace(/^52/, ''); // 10 dígitos MX
+}
+
+visitForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name  = visitForm.name?.value?.trim() || '';
+  const phone = normalizePhoneMxPlain(visitForm.phone?.value);
+  const time  = visitForm['contact-time']?.value || 'cualquier-hora';
+  const notes = visitForm.notes?.value?.trim() || '';
+  const consent = document.getElementById('visit-consent')?.checked;
+  const propTitle = document.getElementById('visit-prop-title')?.textContent?.trim() || 'Propiedad';
+
+  if (!name) { alert('Por favor, escribe tu nombre.'); return; }
+  if (!phone || phone.length < 10) { alert('Teléfono inválido.'); return; }
+  if (!consent) { alert('Debes aceptar el contacto.'); return; }
+
+  // (Tu vista previa si la usas...)
+  if (visitPreview) {
+    visitPreview.textContent = JSON.stringify({
+      property_title: propTitle, name, phone, contact_time: time, notes
+    }, null, 2);
+    visitPreview.hidden = false;
+  }
+
+  // === Enviar correo (Apps Script)
+  await sendEmailWebhook({
+    _subject: `Visita — ${propTitle}`,
+    _origin:  "Formulario: Agenda una visita",
+    property_title: propTitle,
+    name,
+    phone,
+    contact_time: time,
+    notes
+  });
+
+  // Reset suave
+  visitForm.reset();
+});

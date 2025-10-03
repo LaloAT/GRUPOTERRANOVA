@@ -1,42 +1,35 @@
 'use strict';
 
-/**
- * navbar toggle en mobile
- */
-const /** {NodeElement} */ $navbar = document.querySelector('[data-navbar]');
-const /** {NodeElement} */ $navToggler = document.querySelector('[data-nav-toggler]');
+/* ==========================================================
+   NAV: toggle en mobile
+========================================================== */
+const /** @type {HTMLElement|null} */ $navbar = document.querySelector('[data-navbar]');
+const /** @type {HTMLElement|null} */ $navToggler = document.querySelector('[data-nav-toggler]');
 
 if ($navToggler) {
-  $navToggler.addEventListener('click', () => $navbar.classList.toggle('active'));
+  $navToggler.addEventListener('click', () => $navbar?.classList.toggle('active'));
 }
 
-/**
- * Estado del header al hacer scroll
- */
-const /** {NodeElement} */ $header = document.querySelector('[data-header]');
+/* ==========================================================
+   Header: estado al hacer scroll
+========================================================== */
+const /** @type {HTMLElement|null} */ $header = document.querySelector('[data-header]');
 
 window.addEventListener('scroll', () => {
-  if ($header) {
-    $header.classList[window.scrollY > 50 ? 'add' : 'remove']('active');
-  }
-});
-
-/**
- * Toggle de botón "favorito"
- */
-const /** {NodeList} */ $toggleBtns = document.querySelectorAll('[data-toggle-btn]');
-
-$toggleBtns.forEach($toggleBtn => {
-  $toggleBtn.addEventListener('click', () => {
-    $toggleBtn.classList.toggle('active');
-  });
+  if ($header) $header.classList[window.scrollY > 50 ? 'add' : 'remove']('active');
 });
 
 /* ==========================================================
-   FILTRO DE PROPIEDADES + SECCIÓN "VENDER"
-   ========================================================== */
+   Botones "favorito"
+========================================================== */
+const $toggleBtns = document.querySelectorAll('[data-toggle-btn]');
+$toggleBtns.forEach(btn => btn.addEventListener('click', () => btn.classList.toggle('active')));
 
-// === Selecciones ===
+/* ==========================================================
+   FILTRO DE PROPIEDADES + SECCIÓN "VENDER"
+========================================================== */
+
+// Selecciones
 const $sellFormSection  = document.getElementById('owner-form');              // sección del formulario
 const $propertySection  = document.querySelector('.section.property');        // sección de cards
 const $wantSelect       = document.querySelector('select[name="want-to"]');
@@ -44,30 +37,27 @@ const $typeSelect       = document.querySelector('select[name="property-type"]')
 const $locationInput    = document.querySelector('input[name="location"]');
 const $cards            = Array.from(document.querySelectorAll('.property-list .card'));
 
-// Normaliza texto (minúsculas, sin acentos, trim)
+// Normaliza texto
 function norm(str) {
-  return (str || '').toString().toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  return (str || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
 }
 
-/* ---------- Dirección: utilidades ---------- */
-
-// Limitamos SIEMPRE a León, Gto
+// Utilidades de dirección
 const CITY_TAGS  = ['leon', 'leon de los aldama'];
 const STATE_TAGS = ['gto', 'guanajuato'];
 
-// Mínimo para considerar un término (evita que 'v' filtre todo)
 const MIN_QUERY_CHARS = 3;
-// Abreviaturas útiles que sí aceptamos cortas
 const SHORT_TOKENS = new Set(['av', 'blvd', 'lib', 'col']);
 
-// ¿Vale la pena usar el filtro por ubicación?
 function shouldUseLocation(q){
   const toks = norm(q).split(/[,\s]+/).filter(Boolean);
   return toks.some(t => t.length >= MIN_QUERY_CHARS || SHORT_TOKENS.has(t));
 }
-
-// Sinónimos/variantes de tokens comunes
 function expandToken(t){
   const map = {
     blvd: ['blvd', 'bulevar', 'boulevard', 'blvrd', 'blv'],
@@ -78,29 +68,26 @@ function expandToken(t){
   };
   return map[t] || [t];
 }
-
 function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-// Coincidencia por PALABRAS (inicio de palabra), respetando sinónimos
 function matchesLocation(addrNorm, queryNorm){
   const tokens = queryNorm.split(/[,\s]+/).filter(Boolean);
   for (const t of tokens){
-    if (t.length < MIN_QUERY_CHARS && !SHORT_TOKENS.has(t)) continue; // ignora ruido
+    if (t.length < MIN_QUERY_CHARS && !SHORT_TOKENS.has(t)) continue;
     let ok = false;
     for (const variant of expandToken(t)){
-      const rx = new RegExp(`\\b${escapeRe(variant)}`); // empieza palabra
+      const rx = new RegExp(`\\b${escapeRe(variant)}`);
       if (rx.test(addrNorm)){ ok = true; break; }
     }
-    if (!ok) return false; // si un token no aparece, no hay match
+    if (!ok) return false;
   }
   return true;
 }
 
-// Mapear "Quiero" -> data-operacion de las cards
 function operacionEsperada(want) {
   if (want === 'buy')  return 'comprar';
   if (want === 'rent') return 'rentar';
-  return null; // 'sell' no muestra cards
+  return null;
 }
 
 function filtrarPropiedades() {
@@ -127,7 +114,7 @@ function filtrarPropiedades() {
 
     let visible = cOp === esperado;
 
-    // 1) Limitar SIEMPRE a León, Gto (por seguridad geográfica)
+    // 1) Limitar SIEMPRE a León, Gto
     if (visible) {
       const inLeon = CITY_TAGS.some(t => addr.includes(t))
                   && STATE_TAGS.some(t => addr.includes(t));
@@ -137,7 +124,7 @@ function filtrarPropiedades() {
     // 2) Tipo
     if (visible && tipo !== 'any') visible = cTipo === tipo;
 
-    // 3) Búsqueda por ubicación (solo si la query es "suficiente")
+    // 3) Ubicación (si la query es suficiente)
     if (visible && shouldUseLocation(queryUbicacion)) {
       visible = matchesLocation(addr, queryUbicacion);
     }
@@ -146,12 +133,12 @@ function filtrarPropiedades() {
   });
 }
 
-// Eventos de los filtros
+// Eventos de filtros
 $wantSelect?.addEventListener('change', filtrarPropiedades);
 $typeSelect?.addEventListener('change', filtrarPropiedades);
 $locationInput?.addEventListener('input', filtrarPropiedades);
 
-// Botón "Buscar" del formulario de filtros
+// Form de búsqueda
 document.getElementById('search-form')?.addEventListener('submit', (e) => {
   e.preventDefault();
   filtrarPropiedades();
@@ -164,37 +151,32 @@ filtrarPropiedades();
 
 /* ==========================================================
    FORMULARIO DE PROPIETARIO (VENDER/RENTAR)
-   ========================================================== */
-
+========================================================== */
 const publishForm = document.getElementById('publishForm');
 const previewBox  = document.getElementById('owner-preview');
 
 function normalizePhoneMx(v) {
-  // Deja solo dígitos, quita 52 si ya viene
   const digits = (v || '').replace(/\D+/g, '');
   const trimmed = digits.startsWith('52') ? digits.slice(2) : digits;
   return trimmed;
 }
 
-publishForm?.addEventListener('submit', (e) => {
+publishForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // Campos
   const op    = publishForm['owner-operation']?.value || 'vender';
   const type  = publishForm['property-type']?.value || 'cualquiera';
   const name  = publishForm.name?.value?.trim() || '';
   const phone = normalizePhoneMx(publishForm.phone?.value);
   const time  = publishForm['contact-time']?.value || 'cualquier-hora';
-  const zone  = publishForm.zone?.value?.trim() || '';   // opcional
-  const notes = publishForm.notes?.value?.trim() || '';  // opcional
+  const zone  = publishForm.zone?.value?.trim() || '';
+  const notes = publishForm.notes?.value?.trim() || '';
   const consent = document.getElementById('owner-consent')?.checked;
 
-  // Validación (obligatorios)
   if (!name) { alert('Por favor, escribe tu nombre.'); return; }
   if (!phone || phone.length < 10) { alert('Escribe un teléfono válido (10 dígitos).'); return; }
   if (!consent) { alert('Debes aceptar que te contactemos por teléfono o WhatsApp.'); return; }
 
-  // Vista previa (para pruebas)
   const resumen =
 `✅ Datos recibidos
 • Operación: ${op}
@@ -211,27 +193,39 @@ publishForm?.addEventListener('submit', (e) => {
     previewBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // Enviar correo (Apps Script)
+  await sendEmailWebhook({
+    _subject: `Lead propietario — ${op}/${type}`,
+    _origin:  "Formulario: Publica tu propiedad",
+    operation: op,
+    type,
+    name,
+    phone,              // Apps Script antepone +52 al renderizar
+    contact_time: time,
+    zone,
+    notes
+  });
+
   // Reset suave
   publishForm.reset();
   if (publishForm['owner-operation']) publishForm['owner-operation'][0].checked = true;
   const ownerType = document.getElementById('owner-type');
-  if (ownerType) ownerType.selectedIndex = 0; // vuelve al placeholder
+  if (ownerType) ownerType.selectedIndex = 0;
   const ownerTime = document.getElementById('owner-time');
   if (ownerTime) ownerTime.value = 'cualquier-hora';
 });
 
 /* ==========================================================
-   NAVBAR → atajos (Home únicamente) + Deep links
+   NAVBAR → atajos (Home) + Deep links
 ========================================================== */
 (function setupNavbarShortcuts(){
-  // ¿Estamos en Home? (para no tocar páginas de detalle)
   const isHome = !!(document.querySelector('.search-bar') || document.querySelector('.property-list'));
   if (!isHome) return;
 
   // Referencias
-  const $wantSelect      = document.querySelector('#want-to')       || document.querySelector('select[name="want-to"]');
-  const $typeSelect      = document.querySelector('#property-type') || document.querySelector('select[name="property-type"]');
-  const $locationInput   = document.querySelector('#location')      || document.querySelector('input[name="location"]');
+  const $wantSelect      = document.getElementById('want-to')       || document.querySelector('select[name="want-to"]');
+  const $typeSelect      = document.getElementById('property-type') || document.querySelector('select[name="property-type"]');
+  const $locationInput   = document.getElementById('location')      || document.querySelector('input[name="location"]');
 
   const $sellFormSection = document.getElementById('owner-form');
   const $propertySection = document.querySelector('.section.property');
@@ -260,25 +254,24 @@ publishForm?.addEventListener('submit', (e) => {
     scrollToEl(target);
   }
 
-  // Reset total para Inicio
   function resetToHomeDefault(clickedEl){
-    if ($wantSelect)    $wantSelect.value = 'buy';   // Comprar
-    if ($typeSelect)    $typeSelect.value = 'any';   // Cualquiera
-    if ($locationInput) $locationInput.value = '';   // Ubicación vacía
+    if ($wantSelect)    $wantSelect.value = 'buy';
+    if ($typeSelect)    $typeSelect.value = 'any';
+    if ($locationInput) $locationInput.value = '';
     if ($propertySection) $propertySection.hidden = false;
     if ($sellFormSection) $sellFormSection.hidden = true;
 
     applyFilterIfExists();
     scrollToEl($hero || document.body);
 
-    document.querySelectorAll('.navbar-link[data-nav], .navbar .navbar-link').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.navbar-link[data-nav], .navbar .navbar-link')
+      .forEach(a => a.classList.remove('active'));
     clickedEl?.classList.add('active');
   }
 
-  // Clicks de navbar + footer (solo en Home, para no recargar)
   document.querySelectorAll('.navbar .navbar-link, .footer .footer-link').forEach(a => {
     a.addEventListener('click', (ev) => {
-      // ⛔️ Guard clause: si el enlace apunta a una URL real (no # ni #ancla), dejamos navegar normal
+      // Si tiene href real (no #/ancla), no interceptar
       const href = a.getAttribute('href') || '';
       if (href && href !== '#' && !href.startsWith('#')) return;
 
@@ -294,7 +287,7 @@ publishForm?.addEventListener('submit', (e) => {
     });
   });
 
-  // --- Deep links desde otras páginas o footer ---
+  // Deep links (#go=rent|buy|sell, #nosotros, #property) o ?go=
   function handleDeepLink() {
     const rawHash = (window.location.hash || '').replace(/^#/, '').trim();
     const qsGo = new URLSearchParams(window.location.search).get('go');
@@ -330,7 +323,6 @@ publishForm?.addEventListener('submit', (e) => {
   const $btns = Array.from(document.querySelectorAll('#nav-contact, #footer-contact'));
   if (!$btns.length) return;
 
-  // Referencias (si existen en esta página)
   const $want  = document.getElementById('want-to')       || document.querySelector('select[name="want-to"]');
   const $type  = document.getElementById('property-type') || document.querySelector('select[name="property-type"]');
   const $loc   = document.getElementById('location')      || document.querySelector('input[name="location"]');
@@ -366,7 +358,6 @@ publishForm?.addEventListener('submit', (e) => {
   const video = document.getElementById('home-video');
   if (!card || !btn || !video) return;
 
-  // Logs de diagnóstico
   console.log('[video] canPlayType mp4:', video.canPlayType('video/mp4'));
 
   video.addEventListener('error', () => {
@@ -375,16 +366,13 @@ publishForm?.addEventListener('submit', (e) => {
     alert('No se pudo cargar el video. Revisa la ruta ./assets/video/video-card.mp4');
   });
 
-  // Al presionar Play:
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
-    console.log('[video] click play');
     try {
       card.classList.add('playing');
       video.controls = true;
-      video.load();        // fuerza recarga
+      video.load();
       await video.play();
-      console.log('[video] playing');
     } catch (err) {
       console.warn('[video] play() rechazado:', err);
       card.classList.remove('playing');
@@ -393,7 +381,6 @@ publishForm?.addEventListener('submit', (e) => {
     }
   });
 
-  // Pausa manual
   video.addEventListener('pause', () => {
     if (!video.ended) {
       card.classList.remove('playing');
@@ -401,10 +388,42 @@ publishForm?.addEventListener('submit', (e) => {
     }
   });
 
-  // Al finalizar
   video.addEventListener('ended', () => {
     video.currentTime = 0;
     video.controls = false;
     card.classList.remove('playing');
   });
 })();
+
+/* ==========================================================
+   EMAIL WEBHOOK (Google Apps Script)
+========================================================== */
+const EMAIL_WEBHOOK_URL =
+  "https://script.google.com/macros/s/AKfycbz_aqPfufe-L9Tv3G57UbNO875xPcCrfUcmaBvz1kWsnnCFnBI4PwUcPkvMhqDE3_KhPw/exec";
+
+// ¡OJO! tu secreto tiene "\" y debe escaparse con "\\" en JS:
+const EMAIL_SECRET = "416SsVD>0@zMt-+lLw59S]aE";
+
+/** Envía payload al Apps Script para que te llegue el correo */
+async function sendEmailWebhook(payload){
+  try {
+    const body = JSON.stringify({ ...payload, secret: EMAIL_SECRET });
+
+    // Preferir Beacon (no bloquea la navegación)
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+      navigator.sendBeacon(EMAIL_WEBHOOK_URL, blob);
+      return;
+    }
+
+    // Fallback
+    await fetch(EMAIL_WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body
+    });
+  } catch (err) {
+    console.warn("Webhook email falló:", err);
+  }
+}
