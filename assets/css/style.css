@@ -1797,3 +1797,20 @@ body {
     height: 100%;
   }
 }
+/* FIX: radios/checkbox no deben ocupar 100% */
+input[type="radio"],
+input[type="checkbox"]{
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;           /* mejor alineado con el texto */
+  -webkit-appearance: auto;         /* iOS Safari */
+  appearance: auto;
+  accent-color: var(--primary-100); /* color del check/punto (opcional) */
+}
+
+/* En tu formulario (por si acaso) */
+.owner-form .radio input{
+  width: auto;
+  height: auto;
+  margin: 0;
+}
